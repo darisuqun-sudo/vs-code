@@ -1,0 +1,16 @@
+.code-oss*/
+.tool-cache/
+.tools/
+VSCode-win32-x64/
+vscode-reh-web-win32-x64/
+code-oss-web/dist/
+localization/packs/
+debug.log
+__pycache__/
+releases/
+/Output/
+/*.zip
+/*.tar.gz
+.taskcache/
+.android-release-keys/
+.android-migration-backups/

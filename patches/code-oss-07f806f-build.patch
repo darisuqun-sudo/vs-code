@@ -1,0 +1,115 @@
+diff --git a/build/gulpfile.reh.ts b/build/gulpfile.reh.ts
+index c643cf99..df2406e3 100644
+--- a/build/gulpfile.reh.ts
++++ b/build/gulpfile.reh.ts
+@@ -527,7 +527,9 @@ function prepareCopilotRipgrepShimTaskREH(platform: string, arch: string, destin
+ 		const nodeModulesDir = path.join(outputDir, 'node_modules');
+ 
+ 		const builtInCopilotExtensionDir = path.join(outputDir, 'extensions', 'copilot');
+-		prepareBuiltInCopilotRipgrepShim(platform, arch, builtInCopilotExtensionDir, nodeModulesDir);
++		prepareBuiltInCopilotRipgrepShim(platform, arch, builtInCopilotExtensionDir, nodeModulesDir, {
++			installedPlatformPackagesRoot: path.join(REPO_ROOT, 'extensions', 'copilot', 'node_modules')
++		});
+ 	};
+ }
+ 
+diff --git a/build/lib/copilot.ts b/build/lib/copilot.ts
+index 69375085..be08ce4a 100644
+--- a/build/lib/copilot.ts
++++ b/build/lib/copilot.ts
+@@ -16,6 +16,8 @@ import { ensureNpmPackage, materializeNpmPackageVersion, type EnsureNpmPackageOp
+  */
+ export interface PrepareBuiltInCopilotOptions extends EnsureNpmPackageOptions {
+ 	extensionLockfilePath?: string;
++	/** Reuse an already installed, version-matched platform package before downloading. */
++	installedPlatformPackagesRoot?: string;
+ }
+ 
+ /**
+@@ -376,6 +378,12 @@ function resolveVersionMatchedCopilotPlatformPackage(copilotPackagePlatformArch:
+ 	if (readOptionalPackageVersion(appRootDir) === extVersion) {
+ 		return { dir: appRootDir, cleanup: noop };
+ 	}
++	if (options.installedPlatformPackagesRoot) {
++		const installedDir = path.join(options.installedPlatformPackagesRoot, '@github', `copilot-${copilotPackagePlatformArch}`);
++		if (readOptionalPackageVersion(installedDir) === extVersion) {
++			return { dir: installedDir, cleanup: noop };
++		}
++	}
+ 
+ 	const integrity = resolvePinnedPlatformPackageIntegrity(packageName, extVersion, options);
+ 	const staged = fs.mkdtempSync(path.join(os.tmpdir(), 'vscode-copilot-native-'));
+diff --git a/build/lib/extensions.ts b/build/lib/extensions.ts
+index 10bd9fbd..92a90c09 100644
+--- a/build/lib/extensions.ts
++++ b/build/lib/extensions.ts
+@@ -155,7 +155,8 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
+ 	// Extensions built with esbuild can still externalize runtime dependencies.
+ 	// Ensure those externals are included in the packaged built-in extension.
+ 	const packagedDependenciesByExtension: Record<string, string[]> = {
+-		'git': ['@vscode/fs-copyfile']
++		'git': ['@vscode/fs-copyfile'],
++		'copilot': ['@github/copilot']
+ 	};
+ 	const packagedDependencies = packagedDependenciesByExtension[extensionName] ?? [];
+ 
+@@ -188,6 +189,12 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
+ 				glob.sync(path.join(extensionPath, 'node_modules', dependency, '**'), { nodir: true, dot: true })
+ 					.map(filePath => path.relative(extensionPath, filePath))
+ 					.filter(filePath => {
++						if (extensionName === 'copilot' && dependency === '@github/copilot') {
++							const relative = path.relative(path.join('node_modules', dependency), filePath);
++							if (relative !== 'package.json' && !relative.startsWith(`sdk${path.sep}`)) {
++								return false;
++							}
++						}
+ 						// Exclude non-.node files from build directories to avoid timestamp-sensitive
+ 						// artifacts (e.g. Makefile) that break macOS universal builds due to SHA mismatches.
+ 						const parts = filePath.split(path.sep);
+diff --git a/build/lib/test/copilot.test.ts b/build/lib/test/copilot.test.ts
+index 7fa59145..aa8a6a9f 100644
+--- a/build/lib/test/copilot.test.ts
++++ b/build/lib/test/copilot.test.ts
+@@ -296,6 +296,34 @@ suite('copilot', () => {
+ 		}
+ 	});
+ 
++	test('reuses a version-matched installed native package without a network fetch', () => {
++		const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'vscode-copilot-installed-test-'));
++		try {
++			const builtIn = path.join(repoRoot, 'extensions', 'copilot');
++			const copilot = path.join(builtIn, 'node_modules', '@github', 'copilot');
++			const installedRoot = path.join(repoRoot, 'installed', 'node_modules');
++			const native = path.join(installedRoot, '@github', 'copilot-win32-x64');
++			const appModules = path.join(repoRoot, 'node_modules');
++			fs.mkdirSync(path.join(copilot, 'sdk'), { recursive: true });
++			fs.writeFileSync(path.join(copilot, 'package.json'), JSON.stringify({ version: '1.0.73' }));
++			fs.mkdirSync(path.join(native, 'prebuilds', 'win32-x64'), { recursive: true });
++			fs.writeFileSync(path.join(native, 'package.json'), JSON.stringify({ version: '1.0.73' }));
++			fs.writeFileSync(path.join(native, 'prebuilds', 'win32-x64', 'runtime.node'), 'PINNED-INSTALLED-NATIVE');
++			fs.mkdirSync(path.join(native, 'tgrep', 'bin', 'win32-x64'), { recursive: true });
++			fs.writeFileSync(path.join(native, 'tgrep', 'bin', 'win32-x64', 'tgrep.exe'), 'PINNED-INSTALLED-TGREP');
++			fs.mkdirSync(path.join(appModules, '@vscode', 'ripgrep-universal', 'bin', 'win32-x64'), { recursive: true });
++			fs.writeFileSync(path.join(appModules, '@vscode', 'ripgrep-universal', 'bin', 'win32-x64', 'rg.exe'), '');
++			prepareBuiltInCopilotRipgrepShim('win32', 'x64', builtIn, appModules, {
++				installedPlatformPackagesRoot: installedRoot,
++				packPackage: () => { throw new Error('The matching installed package must not be downloaded again'); }
++			});
++			assert.strictEqual(fs.readFileSync(path.join(copilot, 'sdk', 'prebuilds', 'win32-x64', 'runtime.node'), 'utf8'), 'PINNED-INSTALLED-NATIVE');
++			assert.strictEqual(fs.readFileSync(path.join(copilot, 'sdk', 'tgrep', 'bin', 'win32-x64', 'tgrep.exe'), 'utf8'), 'PINNED-INSTALLED-TGREP');
++		} finally {
++			fs.rmSync(repoRoot, { recursive: true, force: true });
++		}
++	});
++
+ 	test('materializes a version-matched native when app-root diverges from the pinned extension', () => {
+ 		const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'vscode-copilot-sdk-pinned-test-'));
+ 		try {
+@@ -328,6 +356,7 @@ suite('copilot', () => {
+ 			const packCalls: { packageName: string; version: string }[] = [];
+ 			prepareBuiltInCopilotRipgrepShim('win32', 'x64', builtInCopilotExtensionDir, appNodeModulesDir, {
+ 				extensionLockfilePath,
++				installedPlatformPackagesRoot: appNodeModulesDir,
+ 				packPackage: (packageName, version) => {
+ 					packCalls.push({ packageName, version });
+ 					return tarball;
