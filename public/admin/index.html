@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ug" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Taklimakan · باشقۇرۇش</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="stylesheet" href="/site.css">
+</head>
+<body>
+  <main>
+    <a href="/">تەھرىرلىگۈچكە قايتىش</a>
+    <h1>نەشر باشقۇرۇش</h1>
+    <p>چۈشۈرۈش بېتىدە كۆرسىتىلىدىغان Android نەشرىنى تاللاڭ. ساقلىغاندا GitHub يېڭى ئۆزگەرتىش خاتىرىسى قۇرىدۇ ۋە Vercel بەتنى يېڭىلايدۇ.</p>
+    <form id="login">
+      <label for="token">GitHub زىيارەت ئاچقۇچى
+        <input id="token" type="password" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+      </label>
+      <button type="submit">كىرىش</button>
+      <a href="https://github.com/settings/personal-access-tokens/new" rel="noreferrer">GitHub دا ئاچقۇچ قۇرۇش</a>
+      <small>ئاچقۇچنى پەقەت <bdi>darisuqun-sudo/vs-code</bdi> ئامبىرىغا چەكلەڭ. <bdi>Contents: Read and write</bdi> ھوقۇقى كېرەك.</small>
+    </form>
+    <section id="manager" hidden>
+      <p>ھازىرقى نەشر <bdi id="current"></bdi></p>
+      <div class="panel">
+        <a id="checksum" rel="noreferrer">SHA‑256 ھۆججىتى</a>
+        <a id="notes" rel="noreferrer">نەشر ئۇچۇرى</a>
+      </div>
+      <form id="publish">
+        <label for="candidate">GitHub دىكى نەشر
+          <select id="candidate" dir="ltr" required></select>
+        </label>
+        <button id="save" type="submit">چۈشۈرۈش بېتىنى يېڭىلاش</button>
+      </form>
+      <button id="logout" type="button">چېكىنىش</button>
+    </section>
+    <p id="status" role="status"></p>
+  </main>
+  <script type="module" src="/admin/admin.js"></script>
+</body>
+</html>

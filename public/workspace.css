@@ -1,0 +1,11 @@
+html, body, #workspace { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #181818; }
+#startup {
+  position: fixed; inset: 0; display: grid; place-content: center; justify-items: center;
+  gap: .65rem; padding: 1rem; color: #ddd; background: #181818;
+  font: 1rem/1.6 system-ui, sans-serif; text-align: center;
+}
+#startup p { margin: 0; }
+#startup a { color: #75beff; }
+@media (max-width: 600px) {
+  .monaco-workbench.web .part.editor .gettingStartedContainer .gettingStarted { padding-inline: .9rem; }
+}

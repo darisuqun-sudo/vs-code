@@ -1,104 +1,24 @@
 <!doctype html>
-<html lang="ug" dir="rtl">
+<html lang="en" translate="no" class="notranslate">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#102327">
-  <meta name="description" content="Code-OSS Android نىڭ ئىمزالانغان APK سىنى چۈشۈرۈڭ.">
-  <title>Code‑OSS Android — APK چۈشۈرۈش</title>
-  <link rel="icon" type="image/svg+xml" href="./logo.svg">
-  <style>
-    :root {
-      color-scheme: dark;
-      font-family: "Noto Sans Arabic", "Microsoft Uighur", "Segoe UI", system-ui, sans-serif;
-      font-size: 100%;
-      background: #102327;
-      color: #f1f9f4;
-    }
-    * { box-sizing: border-box; }
-    body {
-      min-height: 100vh;
-      margin: 0;
-      padding: clamp(1rem, 5vw, 4rem);
-      display: grid;
-      place-items: center;
-      background: radial-gradient(ellipse at top right, #1d4643 0, transparent 58%), #102327;
-    }
-    main {
-      width: min(100%, 44rem);
-      padding: clamp(1.35rem, 6vw, 3rem);
-      background: #142e32;
-      border: 1px solid #34575a;
-      border-radius: 1.35rem;
-      box-shadow: 0 18px 55px #08191975;
-    }
-    .brand {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: .85rem;
-    }
-    .brand img {
-      width: clamp(3rem, 10vw, 4.5rem);
-      height: auto;
-    }
-    h1 {
-      margin: .85rem 0 1rem;
-      font: 750 clamp(2rem, 7vw, 3.6rem)/1.13 system-ui, sans-serif;
-      overflow-wrap: anywhere;
-    }
-    p { margin: 0; font-size: clamp(1.125rem, 2.4vw, 1.25rem); line-height: 1.75; color: #c3dcd6; }
-    .badge {
-      display: inline-block;
-      padding: .28rem .8rem;
-      background: #254744;
-      color: #bef4d8;
-      border-radius: 2rem;
-      font-size: 1rem;
-    }
-    .actions { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.55rem 0 1.25rem; }
-    .actions a {
-      display: inline-flex;
-      min-height: 2.85rem;
-      align-items: center;
-      gap: .3em;
-      padding: .55rem 1rem;
-      border: 1px solid #698884;
-      border-radius: .7rem;
-      color: #f1f9f4;
-      text-decoration: none;
-      font-size: 1.0625rem;
-      font-weight: 700;
-    }
-    .actions .primary { border-color: #9ce8be; background: #9ce8be; color: #102d27; }
-    .actions a:hover { background: #294c4d; }
-    .actions .primary:hover { background: #bcf6d5; }
-    a:focus-visible { outline: 3px solid #f4cb84; outline-offset: 3px; }
-    .details { border-block-start: 1px solid #34575a; padding-block-start: 1rem; font-size: 1.0625rem; }
-    .details + p { margin-block-start: .65rem; font-size: 1.0625rem; }
-    @media (max-width: 25rem) {
-      .actions a { flex: 1 1 100%; justify-content: center; }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#181818">
+  <meta name="description" content="Open the Code - OSS editor in your browser.">
+  <title>Code - OSS · Taklimakan</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="stylesheet" href="/workbench-runtime/out/vs/workbench/workbench.web.main.internal.css">
+  <link rel="stylesheet" href="/workbench-runtime/rtl.css">
+  <link rel="stylesheet" href="/workspace.css">
 </head>
 <body>
-  <main aria-labelledby="title">
-    <header>
-      <div class="brand">
-        <img src="./logo.svg" width="72" height="72" alt="">
-        <span class="badge">ئاممىۋى سىناق نەشرى · <bdi>draft15</bdi></span>
-      </div>
-      <h1 id="title"><bdi>Code‑OSS Android</bdi></h1>
-    </header>
-    <p><bdi>Android</bdi> ئۈچۈن ئۇيغۇرچە، تۈركچە، ئەرەبچە ۋە ئىنگلىزچە كود تەھرىرلىگۈچ. تار ئېكراندا ھۆججەت تىزىملىكى بىلەن تەھرىرلىگۈچ نۆۋەت بىلەن كەڭ ئېچىلىدۇ.</p>
-    <nav class="actions" aria-label="چۈشۈرۈش ئۇلانمىلىرى">
-      <a class="primary" href="https://github.com/darisuqun-sudo/code-oss-android-downloads/releases/download/v1.140.0-android-draft15/CodeOSS-Android-draft15.apk">ئىمزالانغان APK نى چۈشۈرۈش</a>
-      <a href="https://github.com/darisuqun-sudo/code-oss-android-downloads/releases/download/v1.140.0-android-draft15/SHA256SUMS.txt"><bdi>SHA‑256</bdi> ھۆججىتى</a>
-      <a href="https://github.com/darisuqun-sudo/code-oss-android-downloads/releases/tag/v1.140.0-android-draft15">نەشر ئۇچۇرى</a>
-    </nav>
-    <p class="details">نەشرى <bdi>1.140.0-android-draft15</bdi> · <bdi>199.1 MiB</bdi><br>
-    <bdi>Android 15</bdi> تەقلىدلىگۈچى ۋە <bdi>Android 16</bdi> دىكى <bdi>Samsung SM‑A155F</bdi> دا سىنالدى.</p>
-    <p>چۈشۈرۈلگەن <bdi>APK</bdi> نى <bdi>Android</bdi> يانفونىدا ئېچىپ، قاچىلاش كۆرسەتمىسىگە ئەمەل قىلىڭ.</p>
-  </main>
+  <div id="workspace"></div>
+  <div id="startup">
+    <img src="/logo.svg" width="48" height="48" alt="">
+    <p id="startup-message" role="status">Loading Code - OSS…</p>
+    <a href="/download" lang="ug" dir="rtl">Android نۇسخىسىنى چۈشۈرۈش</a>
+    <noscript>Enable JavaScript to open the editor.</noscript>
+  </div>
+  <script type="module" src="/workspace.js"></script>
 </body>
 </html>

@@ -1,0 +1,80 @@
+const base = new URL('/workbench-runtime/', location.origin);
+const locales = {
+  en: ['English', 'Android: Download the app'],
+  ug: ['ئۇيغۇرچە', 'Android نۇسخىسىنى چۈشۈرۈش'],
+  tr: ['Türkçe', 'Android uygulamasını indir'],
+  ar: ['العربية', 'تنزيل تطبيق أندرويد'],
+};
+
+function rememberLocale(locale) {
+  try { localStorage.setItem('vscode.nls.locale', locale); } catch { /* The URL also carries the preference. */ }
+}
+
+async function loadJson(path) {
+  const response = await fetch(new URL(path, base));
+  if (!response.ok) throw new Error('Unable to load ' + path + ': HTTP ' + response.status);
+  return response.json();
+}
+
+async function start() {
+  let stored;
+  try { stored = localStorage.getItem('vscode.nls.locale'); } catch { /* Use the default. */ }
+  const requested = new URL(location.href).searchParams.get('lang');
+  const locale = [requested, stored, 'en'].find(value => Object.hasOwn(locales, value));
+  rememberLocale(locale);
+  document.documentElement.lang = locale;
+  document.documentElement.dataset.uiDirection = ['ug', 'ar'].includes(locale) ? 'rtl' : 'ltr';
+  globalThis._VSCODE_FILE_ROOT = new URL('out/', base).href;
+  globalThis._VSCODE_NLS_LANGUAGE = locale;
+
+  const [names, gallery] = await Promise.all([
+    loadJson('extensions.json'),
+    loadJson('gallery.json'),
+    import(new URL('locales/' + locale + '/nls.messages.js', base)),
+  ]);
+  const { create, env, commands } = await import(new URL('out/vs/workbench/workbench.web.main.internal.js', base));
+  const compact = matchMedia('(max-width: 600px)').matches;
+  const languageCommands = Object.entries(locales).map(([id, [label]]) => ({
+    id: 'taklimakan.language.' + id,
+    label: 'Language: ' + label,
+    handler() {
+      rememberLocale(id);
+      const url = new URL(location.href);
+      url.searchParams.set('lang', id);
+      location.assign(url);
+    },
+  }));
+  create(document.getElementById('workspace'), {
+    productConfiguration: { extensionsGallery: gallery },
+    additionalBuiltinExtensions: names.map(name => ({
+      scheme: location.protocol.slice(0, -1),
+      authority: location.host,
+      path: new URL('extensions/' + encodeURIComponent(name), base).pathname,
+    })),
+    configurationDefaults: {
+      'workbench.startupEditor': 'welcomePage',
+      'workbench.colorTheme': 'Dark 2026',
+      'workbench.sideBar.location': 'left',
+      'workbench.secondarySideBar.defaultVisibility': 'hidden',
+      ...(compact ? { 'workbench.editor.useModal': 'off', 'editor.wordWrap': 'on' } : {}),
+    },
+    commands: [...languageCommands, {
+      id: 'taklimakan.android.download',
+      label: locales[locale][1],
+      handler: () => location.assign('/download'),
+    }],
+  });
+  await env.retrievePerformanceMarks();
+  try {
+    if (!localStorage.getItem('taklimakan.layout-initialized')) {
+      await commands.executeCommand(compact ? 'workbench.action.closeSidebar' : 'workbench.view.explorer');
+      localStorage.setItem('taklimakan.layout-initialized', '1');
+    }
+  } catch { /* The Explorer remains available from the activity bar. */ }
+  document.getElementById('startup').remove();
+}
+
+start().catch(error => {
+  console.error(error);
+  document.getElementById('startup-message').textContent = 'Code - OSS could not load. Refresh to retry.';
+});
