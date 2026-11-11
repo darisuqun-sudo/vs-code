@@ -47,11 +47,14 @@ function updateButton() {
 login.addEventListener('submit', async event => {
   event.preventDefault();
   const field = $('token');
+  const releaseField = $('release-token');
   const button = login.querySelector('button');
   const token = field.value.trim();
+  const releaseToken = releaseField.value.trim();
   field.value = '';
-  if (!/^github_pat_[0-9A-Za-z_]+$/.test(token)) {
-    status.textContent = 'GitHub دىكى ئامبارغا چەكلەنگەن ئاچقۇچنى كىرگۈزۈڭ.';
+  releaseField.value = '';
+  if (![token, releaseToken].every(value => /^github_pat_[0-9A-Za-z_]+$/.test(value))) {
+    status.textContent = 'ھەر ئىككى ئامبارغا ماس GitHub ئاچقۇچىنى كىرگۈزۈڭ.';
     return;
   }
   button.disabled = true;
@@ -61,7 +64,7 @@ login.addEventListener('submit', async event => {
     if (user.login?.toLowerCase() !== owner) throw new Error('Wrong GitHub account', { cause: 403 });
     const [file, releases] = await Promise.all([
       request(source + '?ref=main', token),
-      request('/repos/' + releaseRepo + '/releases?per_page=50'),
+      request('/repos/' + releaseRepo + '/releases?per_page=50', releaseToken),
     ]);
     const release = validateRelease(JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(file.content), c => c.charCodeAt(0)))));
     const choices = candidates(releases);
