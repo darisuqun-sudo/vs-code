@@ -9,6 +9,16 @@ debug.log
 __pycache__/
 releases/
 /Output/
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+*.msixupload
+*.appxupload
+*.pfx
+*.p12
+*.jks
+*.keystore
 /*.zip
 /*.tar.gz
 .taskcache/

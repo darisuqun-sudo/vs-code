@@ -1,0 +1,31 @@
+--- a/android-apk/app/src/main/AndroidManifest.xml
++++ b/android-apk/app/src/main/AndroidManifest.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="local.codeoss.apk"
+-    android:versionCode="15" android:versionName="1.140.0-android-draft15">
++    android:versionCode="16" android:versionName="1.140.0-android-draft16">
+     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
+     <uses-permission android:name="android.permission.INTERNET" />
+     <application tools:targetApi="33" android:name=".CodeOssApplication" android:label="@string/app_name"
+--- a/android-apk/web/bootstrap.js
++++ b/android-apk/web/bootstrap.js
+@@ -53,7 +53,9 @@
+  'terminal.integrated.defaultProfile.linux': 'Android sh',
+  'terminal.integrated.gpuAcceleration': 'off',
+  '[plaintext]': { ...template['[plaintext]'], 'editor.fontFamily': "'Microsoft Uighur', 'Noto Naskh Arabic', 'Segoe UI', sans-serif" },
+- 'workbench.sideBar.location': rtl ? 'right' : 'left'
++ 'workbench.startupEditor': 'welcomePage',
++ 'workbench.colorTheme': 'Dark 2026',
++ 'workbench.sideBar.location': 'left'
+ };
+ const mobile = matchMedia('(max-width: 768px)').matches;
+ const compactExplorer = matchMedia('(max-width: 480px)');
+@@ -66,7 +68,6 @@
+  configurationDefaults['debug.console.wordWrap'] = true;
+  configurationDefaults['workbench.list.horizontalScrolling'] = true;
+  configurationDefaults['workbench.secondarySideBar.defaultVisibility'] = 'hidden';
+- configurationDefaults['workbench.startupEditor'] = 'none';
+  configurationDefaults['[plaintext]']['editor.wordWrap'] = 'on';
+ }
+ const buildInfo = await json(new URL('./BUILD_SOURCE.json', base));
