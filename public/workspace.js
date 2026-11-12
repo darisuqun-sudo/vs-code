@@ -59,6 +59,12 @@ async function start() {
   ]);
   const { create, env, commands } = await import(new URL('out/vs/workbench/workbench.web.main.internal.js', base));
   const compact = matchMedia('(max-width: 600px)').matches;
+  const desktopMenu = matchMedia('(min-width: 900px)').matches;
+  const extensionUri = url => ({
+    scheme: url.protocol.slice(0, -1),
+    authority: url.host,
+    path: url.pathname,
+  });
   const languageCommands = Object.entries(locales).map(([id, [label]]) => ({
     id: 'taklimakan.language.' + id,
     label: 'Language: ' + label,
@@ -66,14 +72,13 @@ async function start() {
   }));
   create(document.getElementById('workspace'), {
     productConfiguration: { extensionsGallery: gallery },
-    additionalBuiltinExtensions: names.map(name => ({
-      scheme: location.protocol.slice(0, -1),
-      authority: location.host,
-      path: new URL('extensions/' + encodeURIComponent(name), base).pathname,
-    })),
+    additionalBuiltinExtensions: [
+      ...names.map(name => extensionUri(new URL('extensions/' + encodeURIComponent(name), base))),
+      extensionUri(new URL('/extensions/taklimakan-layout', location.origin)),
+    ],
     configurationDefaults: {
       'workbench.startupEditor': 'welcomePage',
-      'window.menuBarVisibility': matchMedia('(min-width: 900px)').matches ? 'visible' : 'compact',
+      'window.menuBarVisibility': desktopMenu ? 'visible' : 'compact',
       'workbench.colorTheme': 'Dark 2026',
       'workbench.sideBar.location': 'left',
       'workbench.secondarySideBar.defaultVisibility': 'hidden',
@@ -87,6 +92,9 @@ async function start() {
   });
   await env.retrievePerformanceMarks();
   addLanguageSelector(locale);
+  if (desktopMenu) {
+    commands.executeCommand('taklimakan.layout.restoreTopMenu').catch(error => console.warn('Could not restore the top menu:', error));
+  }
   try {
     if (!localStorage.getItem('taklimakan.layout-initialized')) {
       await commands.executeCommand(compact ? 'workbench.action.closeSidebar' : 'workbench.view.explorer');

@@ -1,0 +1,8 @@
+{
+  "name": "taklimakan-layout",
+  "publisher": "taklimakan",
+  "version": "1.0.0",
+  "engines": { "vscode": "^1.140.0" },
+  "browser": "./extension.js",
+  "activationEvents": ["onCommand:taklimakan.layout.restoreTopMenu"]
+}
