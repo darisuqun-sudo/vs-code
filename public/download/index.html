@@ -3,19 +3,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Code-OSS Android نىڭ ئىمزالانغان APK سىنى چۈشۈرۈڭ.">
-  <title>Code - OSS · APK چۈشۈرۈش</title>
+  <meta name="description" content="Code-OSS نىڭ Android ۋە Windows بوغچىلىرىنى چۈشۈرۈڭ.">
+  <title>Code - OSS · چۈشۈرۈش</title>
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
   <link rel="stylesheet" href="/site.css">
 </head>
 <body>
   <main>
     <a href="/">تەھرىرلىگۈچكە قايتىش</a>
-    <h1><bdi>Code - OSS Android</bdi></h1>
+    <h1><bdi>Code - OSS</bdi> چۈشۈرۈش</h1>
     <p>چۈشۈرۈش ئۈچۈن GitHub ھېساباتىڭىزنىڭ چۈشۈرۈش ئامبىرىغا زىيارەت ھوقۇقى بولۇشى كېرەك.</p>
-    <a class="action" id="apk" hidden>ئىمزالانغان APK نى چۈشۈرۈش</a>
-    <p><bdi id="version" aria-live="polite"></bdi></p>
-    <noscript>چۈشۈرۈش ئۇلانمىسىنى كۆرۈش ئۈچۈن JavaScript نى ئېچىڭ.</noscript>
+    <section aria-labelledby="android-title">
+      <h2 id="android-title"><bdi>Android</bdi></h2>
+      <a class="action" id="apk" hidden>ئىمزالانغان APK نى چۈشۈرۈش</a>
+      <p><bdi id="version" aria-live="polite"></bdi></p>
+      <noscript>APK ئۇلانمىسىنى كۆرۈش ئۈچۈن JavaScript نى ئېچىڭ.</noscript>
+    </section>
+    <section aria-labelledby="windows-title">
+      <h2 id="windows-title"><bdi>Windows x64</bdi></h2>
+      <p>ئىمزاسىز سىناق بوغچىسى. Microsoft Store نىڭ ئىمزاسى تېخى قويۇلمىغان.</p>
+      <a class="action" href="https://github.com/darisuqun-sudo/vs-code/releases/download/windows-msix-v1.140.0.0-preview/Taklimakan-Code-Editor-1.140.0.0-x64-preview.msix">Windows MSIX سىناق بوغچىسىنى چۈشۈرۈش</a>
+    </section>
   </main>
   <script type="module" src="/download/download.js"></script>
 </body>
