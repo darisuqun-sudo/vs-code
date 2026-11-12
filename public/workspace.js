@@ -1,13 +1,38 @@
 const base = new URL('/workbench-runtime/', location.origin);
 const locales = {
-  en: ['English', 'Android: Download the app'],
-  ug: ['ئۇيغۇرچە', 'Android نۇسخىسىنى چۈشۈرۈش'],
-  tr: ['Türkçe', 'Android uygulamasını indir'],
-  ar: ['العربية', 'تنزيل تطبيق أندرويد'],
+  en: ['English', 'Android: Download the app', 'Display language'],
+  ug: ['ئۇيغۇرچە', 'Android نۇسخىسىنى چۈشۈرۈش', 'كۆرۈنمە يۈز تىلى'],
+  tr: ['Türkçe', 'Android uygulamasını indir', 'Görüntüleme dili'],
+  ar: ['العربية', 'تنزيل تطبيق أندرويد', 'لغة العرض'],
 };
 
 function rememberLocale(locale) {
   try { localStorage.setItem('vscode.nls.locale', locale); } catch { /* The URL also carries the preference. */ }
+}
+
+function changeLocale(locale) {
+  rememberLocale(locale);
+  const url = new URL(location.href);
+  url.searchParams.set('lang', locale);
+  location.assign(url);
+}
+
+function addLanguageSelector(locale) {
+  const statusItems = document.querySelector('#workspace .part.statusbar > .right-items');
+  if (!statusItems) return;
+  const selector = document.createElement('select');
+  selector.className = 'taklimakan-language';
+  selector.setAttribute('aria-label', locales[locale][2]);
+  selector.title = locales[locale][2];
+  for (const [id, [label]] of Object.entries(locales)) {
+    const option = new Option(label, id);
+    option.lang = id;
+    option.dir = 'auto';
+    selector.add(option);
+  }
+  selector.value = locale;
+  selector.addEventListener('change', () => changeLocale(selector.value));
+  statusItems.prepend(selector);
 }
 
 async function loadJson(path) {
@@ -37,12 +62,7 @@ async function start() {
   const languageCommands = Object.entries(locales).map(([id, [label]]) => ({
     id: 'taklimakan.language.' + id,
     label: 'Language: ' + label,
-    handler() {
-      rememberLocale(id);
-      const url = new URL(location.href);
-      url.searchParams.set('lang', id);
-      location.assign(url);
-    },
+    handler: () => changeLocale(id),
   }));
   create(document.getElementById('workspace'), {
     productConfiguration: { extensionsGallery: gallery },
@@ -53,6 +73,7 @@ async function start() {
     })),
     configurationDefaults: {
       'workbench.startupEditor': 'welcomePage',
+      'window.menuBarVisibility': matchMedia('(min-width: 900px)').matches ? 'visible' : 'compact',
       'workbench.colorTheme': 'Dark 2026',
       'workbench.sideBar.location': 'left',
       'workbench.secondarySideBar.defaultVisibility': 'hidden',
@@ -65,6 +86,7 @@ async function start() {
     }],
   });
   await env.retrievePerformanceMarks();
+  addLanguageSelector(locale);
   try {
     if (!localStorage.getItem('taklimakan.layout-initialized')) {
       await commands.executeCommand(compact ? 'workbench.action.closeSidebar' : 'workbench.view.explorer');
